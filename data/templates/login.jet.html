@@ -1,0 +1,75 @@
+{{extends "layout/base"}}
+
+{{block title()}} VulTracks - Login {{end}}
+
+{{block body()}}
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <h1>Welcome !</h1>
+                <p>Please login to VulTracks</p>
+            </div>
+        </div>
+        <form class="row needs-validation" id="loginForm" onsubmit="validateForm(); return false">
+            <div class="col-12 my-2">
+                <label for="loginFormUsername" class="form-label">Username</label>
+                <input type="text" class="form-control" id="loginFormUsername" aria-labelledby="usernameHelpBlock" required minlength="3" maxlength="20">
+            </div>
+            <div class="col-12 my-2">
+                <label for="loginFormPassword" class="form-label">Password</label>
+                <input type="password" id="loginFormPassword" class="form-control" aria-labelledby="passwordHelpBlock" required minlength="8" maxlength="20" pattern="(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,20}">
+            </div>
+            <div class="col-12 my-2 d-flex align-items-center">
+                <button class="btn btn-primary" type="submit" form="loginForm">Login</button>
+                <div class="ms-4 spinner-border text-primary visually-hidden" id="loginSpinner" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </form>
+    </div>
+{{end}}
+
+{{block scripts()}}
+    <script>
+        const loginForm = document.querySelector('#loginForm')
+        const spinner = document.querySelector('#loginSpinner')
+
+        const validateForm = () => {
+            if (!loginForm.checkValidity()) {
+                loginForm.classList.add('was-validated')
+                return false
+            }
+            spinner.classList.remove('visually-hidden')
+
+            performRequest('/auth/login', 'POST', {
+                username: document.querySelector('#loginFormUsername').value,
+                password: document.querySelector('#loginFormPassword').value
+            }).then(response => {
+                spinner.classList.add('visually-hidden')
+                if (response.response.status === 200) {
+                    window.location = '/'
+                    return
+                }
+                if (response.response.status === 404) {
+                    generateToast('Invalid username or password', 'primary')
+                    return
+                }
+                generateToast('An error occurred. Please try again later.', 'danger')
+            }).catch(error => {
+                console.error(error)
+                spinner.classList.add('visually-hidden')
+                generateToast('An error occurred. Please try again later.', 'danger')
+            })
+            return false
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search)
+            if (urlParams.get('success') === 'true') {
+                generateToast('Now log in with your newly created account ' + urlParams.get('username') + '!', 'primary')
+                document.querySelector('#loginFormUsername').value = urlParams.get('username')
+            }
+        });
+    </script>
+{{end}}
+

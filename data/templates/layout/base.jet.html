@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{yield title()}}</title>
+    {{include "head"}}
+</head>
+<body>
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="toastParent" class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    {{include "nav"}}
+    {{yield body()}}
+    {{yield scripts()}}
+
+    <script>
+        const toastParent = document.getElementById('toastParent')
+        const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastParent)
+
+        const generateToast = (message, color) => {
+            toastParent.classList.remove('bg-primary', 'bg-success', 'bg-danger')
+            toastParent.classList.add(`bg-${color}`)
+            toastParent.querySelector('.toast-body').innerHTML = message
+            toastBootstrap.show()
+        }
+
+        const getCookie = (name) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        const performRequest = async (endpoint, method, data) => {
+            let conf = {
+                method: method,
+                headers: {
+                    'X-CSRF-Token': getCookie('csrf_'),
+                }
+            }
+
+            if (data) {
+                conf.headers['Content-Type'] = 'application/json'
+                conf.body = JSON.stringify(data)
+            }
+
+            let response = await fetch(endpoint, conf)
+            let body = {}
+            try { body = await response.json() } catch (e) { body.message = ""; console.error(e) }
+            return { response, body }
+        }
+    </script>
+</body>
+</html>

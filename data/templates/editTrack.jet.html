@@ -1,0 +1,75 @@
+{{extends "layout/base"}}
+
+{{block title()}} VulTracks - Edit {{end}}
+
+{{block body()}}
+	<div class="container py-4">
+		<div class="container py-4">
+			<div class="row justify-content-center">
+				<div class="col-12">
+					<h1>Editing track <span class="text-primary">{{ track["TIT2"] }}</span></h1>
+				</div>
+			</div>
+			<form class="row needs-validation" id="editForm" onsubmit="validateForm(); return false">
+				{{ range _, frame := ID3Frames }}
+					<div class="col-12 my-2">
+						{{ if frame.Tag == "TIT2" }}
+							<label for="editForm{{ frame.Tag}}" class="form-label">{{ frame.Tag }} *</label>
+							<input type="text" class="form-control" id="editForm{{ frame.Tag}}" aria-labelledby="{{ frame.Tag }}HelpBlock" value="{{ track[frame.Tag] }}" required>
+						{{ else }}
+							<label for="editForm{{ frame.Tag }}" class="form-label">{{ frame.Tag }}</label>
+							<input type="text" class="form-control" id="editForm{{ frame.Tag }}" aria-labelledby="{{ frame.Tag }}HelpBlock" value="{{ track[frame.Tag] }}">
+						{{ end }}
+						<div id="{{ frame.Tag }}HelpBlock" class="form-text">
+							{{ frame.Description }}
+						</div>
+					</div>
+				{{ end }}
+				<div class="col-12 my-2 d-flex align-items-center">
+					<a href="/"><button type="button" class="btn btn-secondary me-3"><i class="me-2 fa fa-arrow-left"></i>Go back</button></a>
+					<button class="btn btn-primary" type="submit" form="editForm">Submit</button>
+					<div class="ms-4 spinner-border text-primary visually-hidden" id="editSpinner" role="status">
+						<span class="visually-hidden">Loading...</span>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+{{end}}
+
+{{block scripts()}}
+	<script>
+	    const editForm = document.querySelector('#editForm')
+	    const spinner = document.querySelector('#editSpinner')
+
+	    const validateForm = () => {
+	        if (!editForm.checkValidity()) {
+	            editForm.classList.add('was-validated')
+	            return false
+	        }
+	        spinner.classList.remove('visually-hidden')
+
+	        performRequest('/track/{{ track["id"] }}/id3', 'PATCH', {
+            	{{ range _, frame := ID3Frames }}
+					{{ frame.Tag }}: document.querySelector('#editForm{{ frame.Tag }}').value,
+				{{ end }}
+	        }).then(response => {
+	            spinner.classList.add('visually-hidden')
+	            if (response.response.status === 200) {
+	                window.location = '/'
+	                return
+	            }
+	            if (response.response.status === 404) {
+	                generateToast('Invalid username or password', 'primary')
+	                return
+	            }
+	            generateToast('An error occurred. Please try again later.', 'danger')
+	        }).catch(error => {
+	            console.error(error)
+	            spinner.classList.add('visually-hidden')
+	            generateToast('An error occurred. Please try again later.', 'danger')
+	        })
+	        return false
+	    }
+	</script>
+{{end}}

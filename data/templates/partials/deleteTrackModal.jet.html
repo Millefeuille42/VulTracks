@@ -1,0 +1,35 @@
+<div class="modal fade" id="deleteTrackModal" tabindex="-1" aria-labelledby="deleteTrackModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="newTrackModalLabel">Confirmation</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this track <b id="deleteTrackModalTrackName"> ?</b>
+        <input type="hidden" id="deleteTrackModalTrackId">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" type="button" onclick="deleteTrack()">Delete track</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const deleteTrack = () => {
+    let id = document.querySelector('#deleteTrackModalTrackId').value
+
+    performRequest(`/track/${id}`, 'DELETE').then(response => {
+      if (response.response.status === 200) {
+        window.location.reload()
+      } else {
+        generateToast('Failed to delete track', 'danger')
+      }
+    }).catch(err => {
+      console.error(err)
+      generateToast('Failed to delete track', 'danger')
+    })
+  }
+</script>

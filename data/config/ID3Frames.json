@@ -1,0 +1,9 @@
+[
+  {"Tag": "TIT2", "Description": "Title of the track"},
+  {"Tag": "TPE1", "Description": "Main artist"},
+  {"Tag": "TALB", "Description": "Album it belongs to"},
+  {"Tag": "TRCK", "Description": "Track number on the album"},
+  {"Tag": "TCON", "Description": "Genre of the track"},
+  {"Tag": "TBPM", "Description": "BPM of the track"},
+  {"Tag": "TENC", "Description": "Encoded by (who)"}
+]

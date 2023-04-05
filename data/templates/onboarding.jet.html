@@ -1,0 +1,78 @@
+{{extends "layout/base"}}
+
+{{block title()}} VulTracks - Onboarding {{end}}
+
+{{block body()}}
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <h1>Welcome !</h1>
+                <p>It seems that this is your first time here. Let's create yourself an administrator account first</p>
+            </div>
+        </div>
+        <form class="row needs-validation" id="onboardingForm" onsubmit="validateForm(); return false">
+            <div class="col-12 my-2">
+                <label for="onboardingFormUsername" class="form-label">Username</label>
+                <input type="text" class="form-control" id="onboardingFormUsername" aria-labelledby="usernameHelpBlock" required minlength="3" maxlength="20">
+                <div id="usernameHelpBlock" class="form-text">
+                    Your username must be 3-20 characters long.
+                </div>
+                <div class="invalid-feedback">
+                    Invalid username.
+                </div>
+            </div>
+            <div class="col-12 my-2">
+                <label for="onboardingFormPassword" class="form-label">Password</label>
+                <input type="password" id="onboardingFormPassword" class="form-control" aria-labelledby="passwordHelpBlock" required minlength="8" maxlength="20" pattern="(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,20}">
+                <div id="passwordHelpBlock" class="form-text">
+                    Your password must be 8-20 characters long, contain both uppercase and lowercase letters and numbers.
+                </div>
+                <div class="invalid-feedback">
+                    Invalid password.
+                </div>
+            </div>
+            <div class="col-12 my-2 d-flex align-items-center">
+                <button class="btn btn-primary" type="submit" form="onboardingForm">Start using VulTracks</button>
+                <div class="ms-4 spinner-border text-primary visually-hidden" id="onboardingSpinner" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </form>
+    </div>
+{{end}}
+
+{{block scripts()}}
+    <script>
+        const onboardingForm = document.querySelector('#onboardingForm')
+        const spinner = document.querySelector('#onboardingSpinner')
+
+        const validateForm = () => {
+            if (!onboardingForm.checkValidity()) {
+                onboardingForm.classList.add('was-validated')
+                return false
+            }
+            spinner.classList.remove('visually-hidden')
+
+            performRequest('/user', 'POST', {
+                username: document.querySelector('#onboardingFormUsername').value,
+                password: document.querySelector('#onboardingFormPassword').value
+            }).then(response => {
+                spinner.classList.add('visually-hidden')
+                if (response.response.status === 200) {
+                    window.location = '/login?success=true&username=' + document.querySelector('#onboardingFormUsername').value
+                } else {
+                    if (response.response.status === 409) {
+                        generateToast('Username already exists.', 'primary')
+                        return
+                    }
+                    generateToast('An error occurred. Please try again later.', 'danger')
+                }
+            }).catch(error => {
+                console.log(error)
+                spinner.classList.add('visually-hidden')
+                generateToast('An error occurred. Please try again later.', 'danger')
+            })
+            return false
+        }
+    </script>
+{{end}}
