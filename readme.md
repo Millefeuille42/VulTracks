@@ -1,6 +1,18 @@
 # VulTracks
 All-In-One music library manager
 
+![GitHub](https://img.shields.io/github/license/Millefeuille42/VulTracks)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Millefeuille42/VulTracks)
+
+![GitHub last commit](https://img.shields.io/github/last-commit/Millefeuille42/VulTracks)
+![GitHub issues](https://img.shields.io/github/issues/Millefeuille42/VulTracks)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/Millefeuille42/VulTracks)
+
+![GitHub language count](https://img.shields.io/github/languages/count/Millefeuille42/VulTracks)
+![GitHub top language](https://img.shields.io/github/languages/top/Millefeuille42/Vultracks)
+![GitHub go.mod Go version (subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/Millefeuille42/VulTracks?filename=go.mod&label=go%20version)
+
+
 ## TODO
 
 ### Core features
