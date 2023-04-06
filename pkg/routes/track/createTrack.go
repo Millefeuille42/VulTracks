@@ -1,7 +1,6 @@
 package track
 
 import (
-	"VulTracks/pkg/globals"
 	"VulTracks/pkg/interfaces"
 	"VulTracks/pkg/models"
 	"VulTracks/pkg/utils"
@@ -59,6 +58,5 @@ func createTrackHandler(c *fiber.Ctx) error {
 		return utils.ReturnError(c, fiber.StatusInternalServerError, err)
 	}
 
-	globals.FirstRun = false
 	return c.Status(fiber.StatusOK).JSON(track)
 }
