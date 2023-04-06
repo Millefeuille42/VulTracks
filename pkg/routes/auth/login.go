@@ -24,7 +24,7 @@ func loginHandler(c *fiber.Ctx) error {
 	user := new(models.UserModel)
 	_, err := user.GetUserByUsername(credentials.Username)
 	if err != nil {
-		return utils.ReturnError(c, fiber.StatusNotFound, fiber.ErrUnauthorized)
+		return utils.ReturnError(c, fiber.StatusNotFound, fiber.ErrNotFound)
 	}
 
 	err = user.ComparePassword(credentials.Password)

@@ -117,7 +117,9 @@ func main() {
 	})
 
 	app.Use(logger.New())
-	app.Use(csrf.New())
+	if !globals.Dev {
+		app.Use(csrf.New())
+	}
 	app.Use(favicon.New(favicon.Config{
 		File: globals.StaticLocation + "/images/logo.png",
 		URL:  "/favicon.ico",
