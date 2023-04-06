@@ -25,7 +25,10 @@ All-In-One music library manager
     - [ ] Move track on path edit ?
 - [x] If path is changed out of app, have an "invalid path" state
 - [ ] Settings
-- [ ] Folder import
+- [x] Folder import
+- [ ] Folder delete ?
+  - [ ] Delete tracks entry when folder is deleted ?
+- [ ] Folder re-sync 
 - [ ] Sort Table by column
 - [ ] Filter Table
     - [ ] Filter Table by column ?

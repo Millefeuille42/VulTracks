@@ -8,10 +8,11 @@ import (
 )
 
 type TrackModel struct {
-	Id     string `json:"id"`
-	Path   string `json:"path" validate:"required"`
-	Name   string `json:"name" validate:"required"`
-	UserId string `json:"user_id" validate:"required"`
+	Id       string         `json:"id"`
+	Path     string         `json:"path" validate:"required"`
+	Name     string         `json:"name" validate:"required"`
+	UserId   string         `json:"user_id" validate:"required"`
+	FolderId sql.NullString `json:"folder_id"`
 }
 
 func (track *TrackModel) CreateTable() error {
@@ -21,7 +22,9 @@ func (track *TrackModel) CreateTable() error {
 			path TEXT NOT NULL UNIQUE,
 			name TEXT NOT NULL,
 			user_id INTEGER NOT NULL,
-			FOREIGN KEY(user_id) REFERENCES users(id)
+			folder_id INTEGER,
+			FOREIGN KEY(user_id) REFERENCES users(id),
+			FOREIGN KEY (folder_id) REFERENCES folders(id)
 		);
 	`)
 	if err != nil {
@@ -33,7 +36,7 @@ func (track *TrackModel) CreateTable() error {
 
 func appendTracksToList(list []TrackModel, rows *sql.Rows) ([]TrackModel, error) {
 	var track TrackModel
-	err := rows.Scan(&track.Id, &track.Path, &track.Name, &track.UserId)
+	err := rows.Scan(&track.Id, &track.Path, &track.Name, &track.UserId, &track.FolderId)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +67,7 @@ func (track *TrackModel) getTrackByQuery(query squirrel.SelectBuilder) error {
 	}
 	defer rows.Close()
 
-	err = rows.Scan(&track.Id, &track.Path, &track.Name, &track.UserId)
+	err = rows.Scan(&track.Id, &track.Path, &track.Name, &track.UserId, &track.FolderId)
 	if err != nil {
 		return err
 	}
@@ -113,8 +116,8 @@ func GetTracksByUserId(userId string) ([]TrackModel, error) {
 func (track *TrackModel) CreateTrack() error {
 	result, err := squirrel.
 		Insert("tracks").
-		Columns("path", "name", "user_id").
-		Values(track.Path, track.Name, track.UserId).
+		Columns("path", "name", "user_id", "folder_id").
+		Values(track.Path, track.Name, track.UserId, track.FolderId).
 		RunWith(database.Database).Exec()
 	if err != nil {
 		return err

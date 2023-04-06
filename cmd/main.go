@@ -7,6 +7,7 @@ import (
 	"VulTracks/pkg/models"
 	"VulTracks/pkg/routes/auth"
 	"VulTracks/pkg/routes/example"
+	"VulTracks/pkg/routes/folder"
 	"VulTracks/pkg/routes/index"
 	"VulTracks/pkg/routes/track"
 	"VulTracks/pkg/routes/user"
@@ -137,6 +138,7 @@ func main() {
 	auth.Register(app)
 	user.Register(app)
 	track.Register(app)
+	folder.Register(app)
 
 	utils.SetupCloseHandler(app)
 
