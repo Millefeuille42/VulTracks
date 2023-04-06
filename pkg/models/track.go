@@ -19,9 +19,9 @@ func (track *TrackModel) CreateTable() error {
 		CREATE TABLE IF NOT EXISTS tracks (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			path TEXT NOT NULL UNIQUE,
+			name TEXT NOT NULL,
 			user_id INTEGER NOT NULL,
-			FOREIGN KEY(user_id) REFERENCES users(id),
-			name TEXT NOT NULL
+			FOREIGN KEY(user_id) REFERENCES users(id)
 		);
 	`)
 	if err != nil {
@@ -33,7 +33,7 @@ func (track *TrackModel) CreateTable() error {
 
 func appendTracksToList(list []TrackModel, rows *sql.Rows) ([]TrackModel, error) {
 	var track TrackModel
-	err := rows.Scan(&track.Id, &track.Path, &track.UserId, &track.Name)
+	err := rows.Scan(&track.Id, &track.Path, &track.Name, &track.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (track *TrackModel) getTrackByQuery(query squirrel.SelectBuilder) error {
 	}
 	defer rows.Close()
 
-	err = rows.Scan(&track.Id, &track.Path, &track.UserId, &track.Name)
+	err = rows.Scan(&track.Id, &track.Path, &track.Name, &track.UserId)
 	if err != nil {
 		return err
 	}
@@ -113,8 +113,8 @@ func GetTracksByUserId(userId string) ([]TrackModel, error) {
 func (track *TrackModel) CreateTrack() error {
 	result, err := squirrel.
 		Insert("tracks").
-		Columns("path", "user_id", "name").
-		Values(track.Path, track.UserId, track.Name).
+		Columns("path", "name", "user_id").
+		Values(track.Path, track.Name, track.UserId).
 		RunWith(database.Database).Exec()
 	if err != nil {
 		return err
@@ -142,12 +142,12 @@ func (track *TrackModel) UpdateTrack() error {
 		trackQuery = trackQuery.Set("path", track.Path)
 	}
 
-	if track.UserId != "" {
-		trackQuery = trackQuery.Set("user_id", track.UserId)
-	}
-
 	if track.Name != "" {
 		trackQuery = trackQuery.Set("name", track.Name)
+	}
+
+	if track.UserId != "" {
+		trackQuery = trackQuery.Set("user_id", track.UserId)
 	}
 
 	_, err := trackQuery.
