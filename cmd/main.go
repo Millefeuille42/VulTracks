@@ -63,7 +63,7 @@ func install() {
 		return
 	}
 	initFileSystem()
-	database.Database, err = database.NewDatabase(globals.DatabaseLocation)
+	database.Database, err = database.NewDatabase("file:" + globals.DatabaseLocation + "?_foreign_keys=ON")
 	defer database.Database.Close()
 	populateDatabase()
 }
@@ -93,7 +93,7 @@ func main() {
 	utils.AutoPanic(settings.RefreshSettings())
 	utils.AutoPanic(id3Utils.RefreshID3Frames())
 
-	database.Database, err = database.NewDatabase(globals.DatabaseLocation)
+	database.Database, err = database.NewDatabase("file:" + globals.DatabaseLocation + "?_foreign_keys=ON")
 	defer database.Database.Close()
 	utils.AutoPanic(err)
 	_, err = models.GetUsers()
