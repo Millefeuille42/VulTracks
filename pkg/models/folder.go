@@ -9,10 +9,11 @@ import (
 )
 
 type FolderModel struct {
-	Id       string `json:"id"`
-	Path     string `json:"path" validate:"required"`
-	LastScan string `json:"last_scan" validate:"required"`
-	UserId   string `json:"user_id" validate:"required"`
+	Id       string         `json:"id"`
+	Path     string         `json:"path" validate:"required"`
+	LastScan string         `json:"last_scan" validate:"required"`
+	UserId   string         `json:"user_id" validate:"required"`
+	ParentId sql.NullString `json:"parent_id"`
 }
 
 func (folder *FolderModel) CreateTable() error {
@@ -37,7 +38,7 @@ func (folder *FolderModel) CreateTable() error {
 
 func appendFoldersToList(list []FolderModel, rows *sql.Rows) ([]FolderModel, error) {
 	var folder FolderModel
-	err := rows.Scan(&folder.Id, &folder.Path, &folder.LastScan, &folder.UserId)
+	err := rows.Scan(&folder.Id, &folder.Path, &folder.LastScan, &folder.UserId, &folder.ParentId)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +69,7 @@ func (folder *FolderModel) getFolderByQuery(query squirrel.SelectBuilder) error 
 	}
 	defer rows.Close()
 
-	err = rows.Scan(&folder.Id, &folder.Path, &folder.LastScan, &folder.UserId)
+	err = rows.Scan(&folder.Id, &folder.Path, &folder.LastScan, &folder.UserId, &folder.ParentId)
 	if err != nil {
 		return err
 	}
@@ -111,7 +112,7 @@ func (folder *FolderModel) GetFolderByPathAndUserId(path, userId string) (*Folde
 func GetCountPerFolderByUserId(userId string) ([]interfaces.CountPerFolderInterface, error) {
 	rows, err := database.SelectHelper(
 		squirrel.
-			Select("folders.id", "folders.path", "folders.last_scan", "COUNT(tracks.id) AS num_tracks").
+			Select("folders.id", "folders.path", "folders.last_scan", "folders.parent_id", "COUNT(tracks.id) AS num_tracks").
 			From("folders").
 			LeftJoin("tracks ON folders.id = tracks.folder_id").
 			Where(squirrel.Eq{"folders.user_id": userId}).
@@ -125,13 +126,13 @@ func GetCountPerFolderByUserId(userId string) ([]interfaces.CountPerFolderInterf
 	list := make([]interfaces.CountPerFolderInterface, 0)
 
 	var folder interfaces.CountPerFolderInterface
-	err = rows.Scan(&folder.Id, &folder.Path, &folder.LastScan, &folder.Count)
+	err = rows.Scan(&folder.Id, &folder.Path, &folder.LastScan, &folder.ParentId, &folder.Count)
 	if err != nil {
 		return nil, err
 	}
 	list = append(list, folder)
 	for rows.Next() {
-		err = rows.Scan(&folder.Id, &folder.Path, &folder.LastScan, &folder.Count)
+		err = rows.Scan(&folder.Id, &folder.Path, &folder.LastScan, &folder.ParentId, &folder.Count)
 		if err != nil {
 			return nil, err
 		}
@@ -161,8 +162,8 @@ func GetFoldersByUserId(userId string) ([]FolderModel, error) {
 func (folder *FolderModel) CreateFolder() error {
 	result, err := squirrel.
 		Insert("folders").
-		Columns("path", "last_scan", "user_id").
-		Values(folder.Path, folder.LastScan, folder.UserId).
+		Columns("path", "last_scan", "user_id", "parent_id").
+		Values(folder.Path, folder.LastScan, folder.UserId, folder.ParentId).
 		RunWith(database.Database).Exec()
 	if err != nil {
 		return err
@@ -196,6 +197,10 @@ func (folder *FolderModel) UpdateFolder() error {
 
 	if folder.LastScan != "" {
 		folderQuery = folderQuery.Set("last_scan", folder.LastScan)
+	}
+
+	if folder.ParentId.String != "" {
+		folderQuery = folderQuery.Set("parent_id", folder.ParentId)
 	}
 
 	_, err := folderQuery.

@@ -61,7 +61,21 @@ func syncTracksOfFolder(folderPath, userId, folderId string) ([]models.FolderMod
 		folder.Path = path
 		folder.LastScan = time.Now().String()
 		folder.UserId = userId
-		err := folder.CreateFolder()
+
+		parentFolder := new(models.FolderModel)
+		_, err := parentFolder.GetFolderByPathAndUserId(folderPath, userId)
+		if err != nil {
+			if err.Error() != "Not Found" {
+				log.Println(err)
+			}
+		} else {
+			folder.ParentId = sql.NullString{
+				String: parentFolder.Id,
+				Valid:  true,
+			}
+		}
+
+		err = folder.CreateFolder()
 		if err != nil {
 			if !strings.Contains(err.Error(), "UNIQUE constraint failed") {
 				return err
