@@ -54,6 +54,10 @@ func populateDatabase() {
 	fmt.Println("Populating database...")
 	userModel := models.UserModel{}
 	utils.AutoPanic(userModel.CreateTable())
+	trackModel := models.TrackModel{}
+	utils.AutoPanic(trackModel.CreateTable())
+	folderModel := models.FolderModel{}
+	utils.AutoPanic(folderModel.CreateTable())
 }
 
 func install() {
