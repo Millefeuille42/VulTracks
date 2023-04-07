@@ -38,5 +38,6 @@ func createUserHandler(c *fiber.Ctx) error {
 	}
 
 	globals.FirstRun = false
+	user.Password = ""
 	return c.Status(fiber.StatusOK).JSON(user)
 }

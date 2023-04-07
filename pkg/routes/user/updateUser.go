@@ -36,5 +36,6 @@ func updateUserHandler(c *fiber.Ctx) error {
 		return utils.ReturnError(c, fiber.StatusInternalServerError, err)
 	}
 
+	oldUser.Password = ""
 	return c.Status(fiber.StatusOK).JSON(oldUser)
 }

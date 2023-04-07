@@ -2,6 +2,7 @@ package models
 
 import (
 	"VulTracks/pkg/database"
+	"VulTracks/pkg/interfaces"
 	"database/sql"
 	"fmt"
 	"github.com/Masterminds/squirrel"
@@ -18,10 +19,13 @@ func (folder *FolderModel) CreateTable() error {
 	_, err := database.Database.Exec(`
 		CREATE TABLE IF NOT EXISTS folders (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			path TEXT NOT NULL UNIQUE,
+			path TEXT NOT NULL,
 			last_scan TEXT NOT NULL,
 			user_id INTEGER NOT NULL,
-			FOREIGN KEY(user_id) REFERENCES users(id)
+			parent_id INTEGER,
+			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+			FOREIGN KEY(parent_id) REFERENCES folders(id) ON DELETE CASCADE,
+        	UNIQUE(path, user_id)
 		);
 	`)
 	if err != nil {
@@ -93,6 +97,50 @@ func (folder *FolderModel) GetFolderById(id string) (*FolderModel, error) {
 			From("folders").
 			Where(squirrel.Eq{"id": id}),
 	)
+}
+
+func (folder *FolderModel) GetFolderByPathAndUserId(path, userId string) (*FolderModel, error) {
+	return folder, folder.getFolderByQuery(
+		squirrel.
+			Select("*").
+			From("folders").
+			Where(squirrel.And{squirrel.Eq{"path": path}, squirrel.Eq{"user_id": userId}}),
+	)
+}
+
+func GetCountPerFolderByUserId(userId string) ([]interfaces.CountPerFolderInterface, error) {
+	rows, err := database.SelectHelper(
+		squirrel.
+			Select("folders.id", "folders.path", "folders.last_scan", "COUNT(tracks.id) AS num_tracks").
+			From("folders").
+			LeftJoin("tracks ON folders.id = tracks.folder_id").
+			Where(squirrel.Eq{"folders.user_id": userId}).
+			GroupBy("folders.id"),
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	list := make([]interfaces.CountPerFolderInterface, 0)
+
+	var folder interfaces.CountPerFolderInterface
+	err = rows.Scan(&folder.Id, &folder.Path, &folder.LastScan, &folder.Count)
+	if err != nil {
+		return nil, err
+	}
+	list = append(list, folder)
+	for rows.Next() {
+		err = rows.Scan(&folder.Id, &folder.Path, &folder.LastScan, &folder.Count)
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, folder)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return list, nil
 }
 
 func GetFoldersByUserId(userId string) ([]FolderModel, error) {

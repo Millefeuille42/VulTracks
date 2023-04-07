@@ -26,9 +26,13 @@ All-In-One music library manager
 - [x] If path is changed out of app, have an "invalid path" state
 - [ ] Settings
 - [x] Folder import
-- [ ] Folder delete ?
-  - [ ] Delete tracks entry when folder is deleted ?
-- [ ] Folder re-sync 
+- [x] Folder delete
+  - [x] Delete tracks entry when folder is deleted
+- [x] Folder re-sync 
+- [ ] Folder tree view
+  - [ ] Folder listing with number of tracks
+  - [ ] Parent folder management
+  - [ ] Folder actions (add, delete and re-sync) on GUI
 - [ ] Sort Table by column
 - [ ] Filter Table
     - [ ] Filter Table by column ?
@@ -52,6 +56,7 @@ All-In-One music library manager
 - [x] Onboarding
 - [x] Login
 - [x] Logout
+- [ ] Folder re-sync on app start ?
 - [ ] Different themes
 - [ ] Different levels of logging
 - [ ] Account deletion

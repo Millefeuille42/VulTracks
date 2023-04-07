@@ -18,13 +18,14 @@ type TrackModel struct {
 func (track *TrackModel) CreateTable() error {
 	_, err := database.Database.Exec(`
 		CREATE TABLE IF NOT EXISTS tracks (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			path TEXT NOT NULL UNIQUE,
-			name TEXT NOT NULL,
-			user_id INTEGER NOT NULL,
-			folder_id INTEGER,
-			FOREIGN KEY(user_id) REFERENCES users(id),
-			FOREIGN KEY (folder_id) REFERENCES folders(id)
+        	id INTEGER PRIMARY KEY AUTOINCREMENT,
+        	path TEXT NOT NULL,
+        	name TEXT NOT NULL DEFAULT '',
+        	user_id INTEGER NOT NULL,
+        	folder_id INTEGER,
+        	FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+        	FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE,
+        	UNIQUE(path, user_id)
 		);
 	`)
 	if err != nil {
@@ -104,6 +105,21 @@ func GetTracksByUserId(userId string) ([]TrackModel, error) {
 			Select("*").
 			From("tracks").
 			Where(squirrel.Eq{"user_id": userId}),
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	return getTracksListFromRows(rows)
+}
+
+func GetTracksPerFolder(folderId string) ([]TrackModel, error) {
+	rows, err := database.SelectHelper(
+		squirrel.
+			Select("*").
+			From("tracks").
+			Where(squirrel.Eq{"folder_id": folderId}),
 	)
 	if err != nil {
 		return nil, err
