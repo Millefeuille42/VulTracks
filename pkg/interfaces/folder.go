@@ -12,5 +12,5 @@ type CountPerFolderInterface struct {
 	Path     string         `json:"path"`
 	LastScan string         `json:"last_scan"`
 	ParentId sql.NullString `json:"parent_id"`
-	Count    string         `json:"count"`
+	Count    int            `json:"count"`
 }
