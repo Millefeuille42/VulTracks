@@ -1,0 +1,27 @@
+{{extends "base"}}
+
+{{block title()}} VulTracks {{end}}
+
+{{block body()}}
+	<div class="container py-4">
+		<div class="row">
+			{{ range _, section := sections }}
+					<div class="col-2">
+						{{ if !section.Active }} <a class="text-black text-decoration-none" href="{{ section.Link }}"> {{ end }}
+							<h4 class="mb-0 dashboard_sub_nav_title {{ if section.Active }} active {{ end }}">{{section.Text}}</h4>
+						{{ if !section.Active }} </a> {{end}}
+					</div>
+			{{ end }}
+		</div>
+		<div class="row mb-4">
+			<div class="col-12">
+				<hr class="dashboard_sub_nav_separator" />
+			</div>
+		</div>
+		{{yield dashboardBody()}}
+	</div>
+{{end}}
+
+{{block scripts()}}
+	{{yield dashboardScripts()}}
+{{end}}

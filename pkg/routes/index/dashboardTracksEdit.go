@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func editTrackHandler(c *fiber.Ctx) error {
+func dashboardTracksEdit(c *fiber.Ctx) error {
 	id := c.Params("id")
 	track := new(models.TrackModel)
 

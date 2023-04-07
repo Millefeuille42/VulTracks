@@ -1,26 +1,16 @@
-<div class="modal fade" id="newTrackModal" tabindex="-1" aria-labelledby="newTrackModalLabel" aria-hidden="true">
+<div class="modal fade" id="newFolderModal" tabindex="-1" aria-labelledby="newFolderModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h1 class="modal-title fs-5" id="newTrackModalLabel">Add a new track</h1>
+				<h1 class="modal-title fs-5" id="newFolderModalLabel">Add a new folder</h1>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<form class="row needs-validation" id="newTrackForm" onsubmit="validateForm(); return false">
+				<form class="row needs-validation" id="newFolderForm" onsubmit="validateForm(); return false">
 					<div class="col-12 my-2">
-						<label for="newTrackFormTrackName" class="form-label">Track Name</label>
-						<input type="text" class="form-control" id="newTrackFormTrackName" aria-labelledby="trackNameHelpBlock" required>
-						<div id="trackNameHelpBlock" class="form-text">
-							* Will serve as a fallback if the track name is not found in its tags.
-						</div>
-						<div class="invalid-feedback">
-							Invalid track name.
-						</div>
-					</div>
-					<div class="col-12 my-2">
-						<label for="newTrackFormTrackPath" class="form-label">Track Path</label>
-						<input type="text" id="newTrackFormTrackPath" class="form-control" aria-labelledby="trackPathHelpBlock" required>
-						<div id="trackPathHelpBlock" class="form-text">
+						<label for="newFolderFormFolderPath" class="form-label">Folder Path</label>
+						<input type="text" id="newFolderFormFolderPath" class="form-control" aria-labelledby="folderPathHelpBlock" required>
+						<div id="folderPathHelpBlock" class="form-text">
 							For security reasons, your browser can't get a path from an upload, so you'll have to copy-paste it here.
 						</div>
 						<div class="invalid-feedback">
@@ -28,14 +18,14 @@
 						</div>
 					</div>
 					<div class="col-12 my-2 d-flex align-items-center">
-						<div class="ms-4 spinner-border text-primary visually-hidden" id="newTrackSpinner" role="status">
+						<div class="ms-4 spinner-border text-primary visually-hidden" id="newFolderSpinner" role="status">
 							<span class="visually-hidden">Loading...</span>
 						</div>
 					</div>
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-primary" type="submit" form="newTrackForm">Add Track</button>
+				<button class="btn btn-primary" type="submit" form="newFolderForm">Add folder</button>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 			</div>
 		</div>
@@ -43,20 +33,19 @@
 </div>
 
 <script>
-    const newTrackForm = document.querySelector('#newTrackForm')
-    const spinner = document.querySelector('#newTrackSpinner')
+    const newFolderForm = document.querySelector('#newFolderForm')
+    const spinner = document.querySelector('#newFolderSpinner')
 
     const validateForm = () => {
         console.log('Validating form...')
-        if (!newTrackForm.checkValidity()) {
-            newTrackForm.classList.add('was-validated')
+        if (!newFolderForm.checkValidity()) {
+            newFolderForm.classList.add('was-validated')
             return false
         }
         spinner.classList.remove('visually-hidden')
 
-        performRequest('/track', 'POST', {
-            path: document.querySelector('#newTrackFormTrackPath').value,
-            track_name_fallback: document.querySelector('#newTrackFormTrackName').value
+        performRequest('/folder', 'POST', {
+            path: document.querySelector('#newFolderFormFolderPath').value,
         }).then(response => {
             spinner.classList.add('visually-hidden')
             if (response.response.status === 200) {
@@ -64,7 +53,7 @@
 				return
             }
             if (response.response.status === 409) {
-				generateToast('Track already exists', 'primary')
+				generateToast('Folder already exists', 'primary')
 				return
 			}
             if (response.response.status === 404) {

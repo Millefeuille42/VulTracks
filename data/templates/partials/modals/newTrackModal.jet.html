@@ -1,0 +1,86 @@
+<div class="modal fade" id="newTrackModal" tabindex="-1" aria-labelledby="newTrackModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="newTrackModalLabel">Add a new track</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form class="row needs-validation" id="newTrackForm" onsubmit="validateForm(); return false">
+					<div class="col-12 my-2">
+						<label for="newTrackFormTrackName" class="form-label">Track Name</label>
+						<input type="text" class="form-control" id="newTrackFormTrackName" aria-labelledby="trackNameHelpBlock" required>
+						<div id="trackNameHelpBlock" class="form-text">
+							* Will serve as a fallback if the track name is not found in its tags.
+						</div>
+						<div class="invalid-feedback">
+							Invalid track name.
+						</div>
+					</div>
+					<div class="col-12 my-2">
+						<label for="newTrackFormTrackPath" class="form-label">Track Path</label>
+						<input type="text" id="newTrackFormTrackPath" class="form-control" aria-labelledby="trackPathHelpBlock" required>
+						<div id="trackPathHelpBlock" class="form-text">
+							For security reasons, your browser can't get a path from an upload, so you'll have to copy-paste it here.
+						</div>
+						<div class="invalid-feedback">
+							Invalid path.
+						</div>
+					</div>
+					<div class="col-12 my-2 d-flex align-items-center">
+						<div class="ms-4 spinner-border text-primary visually-hidden" id="newTrackSpinner" role="status">
+							<span class="visually-hidden">Loading...</span>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" type="submit" form="newTrackForm">Add track</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+    const newTrackForm = document.querySelector('#newTrackForm')
+    const spinner = document.querySelector('#newTrackSpinner')
+
+    const validateForm = () => {
+        console.log('Validating form...')
+        if (!newTrackForm.checkValidity()) {
+            newTrackForm.classList.add('was-validated')
+            return false
+        }
+        spinner.classList.remove('visually-hidden')
+
+        performRequest('/track', 'POST', {
+            path: document.querySelector('#newTrackFormTrackPath').value,
+            track_name_fallback: document.querySelector('#newTrackFormTrackName').value
+        }).then(response => {
+            spinner.classList.add('visually-hidden')
+            if (response.response.status === 200) {
+				window.location.reload()
+				return
+            }
+            if (response.response.status === 409) {
+				generateToast('Track already exists', 'primary')
+				return
+			}
+            if (response.response.status === 404) {
+                generateToast('File not found', 'primary')
+                return
+            }
+            if (response.response.status === 400) {
+				generateToast('Invalid file', 'primary')
+				return
+			}
+            generateToast('An error occurred. Please try again later.', 'danger')
+        }).catch(error => {
+            console.log(error)
+            spinner.classList.add('visually-hidden')
+            generateToast('An error occurred. Please try again later.', 'danger')
+        })
+        return false
+    }
+</script>

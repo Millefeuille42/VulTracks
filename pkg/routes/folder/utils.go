@@ -7,9 +7,29 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
+
+func childrenHasFiles(path string, children []os.DirEntry) bool {
+	for _, child := range children {
+		if !child.IsDir() && strings.HasSuffix(child.Name(), ".mp3") {
+			return true
+		}
+		if child.IsDir() {
+			c, err := os.ReadDir(path + "/" + child.Name())
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			if childrenHasFiles(path+"/"+child.Name(), c) {
+				return true
+			}
+		}
+	}
+	return false
+}
 
 func getFilteredFiles(files []os.DirEntry) []os.DirEntry {
 	filteredFiles := make([]os.DirEntry, 0)
@@ -54,7 +74,10 @@ func syncTracksOfFolder(folderPath, userId, folderId string) ([]models.FolderMod
 	err := utils.RecursiveReadDir(folderPath, func(path string, files []os.DirEntry) error {
 		filteredFiles := getFilteredFiles(files)
 		if len(filteredFiles) == 0 {
-			return nil
+			// NOTE : There is certainly a better way to do this, it's here to keep architecture with for example an artist/album/track hierarchy
+			if !childrenHasFiles(path, files) {
+				return nil
+			}
 		}
 
 		folder := new(models.FolderModel)
@@ -63,7 +86,7 @@ func syncTracksOfFolder(folderPath, userId, folderId string) ([]models.FolderMod
 		folder.UserId = userId
 
 		parentFolder := new(models.FolderModel)
-		_, err := parentFolder.GetFolderByPathAndUserId(folderPath, userId)
+		_, err := parentFolder.GetFolderByPathAndUserId(filepath.Dir(path), userId)
 		if err != nil {
 			if err.Error() != "Not Found" {
 				log.Println(err)

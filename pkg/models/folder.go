@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/Masterminds/squirrel"
+	"path/filepath"
 )
 
 type FolderModel struct {
@@ -130,16 +131,15 @@ func GetCountPerFolderByUserId(userId string) ([]interfaces.CountPerFolderInterf
 	if err != nil {
 		return nil, err
 	}
+	folder.Name = filepath.Base(folder.Path)
 	list = append(list, folder)
 	for rows.Next() {
 		err = rows.Scan(&folder.Id, &folder.Path, &folder.LastScan, &folder.ParentId, &folder.Count)
 		if err != nil {
 			return nil, err
 		}
+		folder.Name = filepath.Base(folder.Path)
 		list = append(list, folder)
-		if err != nil {
-			return nil, err
-		}
 	}
 	return list, nil
 }

@@ -11,6 +11,9 @@ func getFoldersOfUserHandler(c *fiber.Ctx) error {
 
 	folders, err := models.GetCountPerFolderByUserId(userId)
 	if err != nil {
+		if err.Error() == "Not Found" {
+			return c.Status(fiber.StatusOK).JSON([]models.FolderModel{})
+		}
 		return utils.ReturnError(c, fiber.StatusInternalServerError, err)
 	}
 

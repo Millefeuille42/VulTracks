@@ -56,7 +56,7 @@
 	        }).then(response => {
 	            spinner.classList.add('visually-hidden')
 	            if (response.response.status === 200) {
-	                window.location = '/'
+	                window.location = '/dashboard/tracks'
 	                return
 	            }
 	            if (response.response.status === 404) {

@@ -1,0 +1,40 @@
+.dashboard_sub_nav_title {
+    padding-bottom: 5px;
+    border-bottom: 3px solid transparent;
+}
+
+.dashboard_sub_nav_title:hover {
+    border-bottom-color: var(--bs-primary);
+    transition: border-bottom-color 0.2s;
+}
+
+.dashboard_sub_nav_title.active {
+    font-weight: bold;
+    border-bottom: 3px solid var(--bs-primary);
+}
+
+.dashboard_sub_nav_separator {
+    margin: -3px 0 0;
+    border-top: 3px solid;
+}
+
+.folder_top_separator {
+    width: 25%;
+    margin: 0;
+    opacity: 1;
+    border-top: 3px solid var(--bs-primary);
+}
+
+.folder_button {
+    transform: rotate(0deg);
+    transition: transform 0.2s;
+}
+
+.folder_button.rotated {
+    transform: rotate(90deg);
+    transition: transform 0.2s;
+}
+
+.vl {
+    border-left: 3px solid var(--bs-primary);
+}

@@ -8,6 +8,7 @@ type FolderInterface struct {
 
 type CountPerFolderInterface struct {
 	Id       string         `json:"folder"`
+	Name     string         `json:"name"`
 	Path     string         `json:"path"`
 	LastScan string         `json:"last_scan"`
 	ParentId sql.NullString `json:"parent_id"`
