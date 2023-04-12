@@ -1,5 +1,8 @@
 {
-	"port": "4000",
-	"host": "0.0.0.0",
-	"heading": "tag"
+	"dashboard.tracks.default_order": "asc",
+	"dashboard.tracks.default_per_page": "10",
+	"dashboard.tracks.default_sort": "id",
+	"dashboard.tracks.heading": "tag",
+	"server.host": "0.0.0.0",
+	"server.port": "4000"
 }

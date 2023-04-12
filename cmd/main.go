@@ -69,6 +69,8 @@ func install() {
 	database.Database, err = database.NewDatabase("file:" + globals.DatabaseLocation + "?_foreign_keys=ON")
 	defer database.Database.Close()
 	populateDatabase()
+	utils.AutoPanic(settings.ParseDefaults())
+	utils.AutoPanic(settings.RewriteSettings())
 }
 
 func registerMiddlewares(app *fiber.App) {

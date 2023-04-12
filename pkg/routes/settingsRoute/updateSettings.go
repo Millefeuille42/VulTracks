@@ -3,25 +3,17 @@ package settingsRoute
 import (
 	"VulTracks/pkg/utils"
 	"VulTracks/pkg/utils/settings"
-	"VulTracks/pkg/validator"
 	"github.com/gofiber/fiber/v2"
 )
 
 func updateSettingsHandler(c *fiber.Ctx) error {
-	newSettings := new(settings.SettingsStruct)
+	newSettings := make(map[string]string)
 
 	if err := c.BodyParser(newSettings); err != nil {
 		return utils.ReturnError(c, fiber.StatusBadRequest, err)
 	}
 
-	errorsList := validator.ValidateStruct(*newSettings, false)
-	if errorsList != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"errors": errorsList,
-		})
-	}
-
-	settings.Settings = *newSettings
+	settings.Settings = newSettings
 
 	err := settings.RewriteSettings()
 	if err != nil {

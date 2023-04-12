@@ -9,17 +9,55 @@
              </button>
          </div>
      </div>
-     <table class="table table-striped table-hover table-bordered">
+    <div class="row">
+        {{ if numberPages > 1 }}
+            <nav aria-label="Tracks navigation">
+                <ul class="pagination">
+                    <li class="page-item">
+                        <a class="page-link {{ if currentPage > 0 }} cursor-pointer" onclick="changePage('{{0}}')" {{end}} aria-label="Previous">
+                            <i aria-hidden="true" class="fa fa-backward-fast"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link {{ if currentPage > 0 }} cursor-pointer" onclick="changePage('{{currentPage-1}}')" {{end}} aria-label="Previous">
+                            <i aria-hidden="true" class="fa fa-backward"></i>
+                        </a>
+                    </li>
+                    <li class="page-item active">
+                        <span class="page-link">{{currentPage + 1}}</span>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link {{ if currentPage < numberPages-1 }} cursor-pointer" onclick="changePage('{{currentPage+1}}')" {{end}} aria-label="Next">
+                            <i aria-hidden="true" class="fa fa-forward"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link {{ if currentPage < numberPages-1 }} cursor-pointer" onclick="changePage('{{numberPages-1}}')" {{end}} aria-label="Previous">
+                            <i aria-hidden="true" class="fa fa-forward-fast"></i>
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+        {{ end }}
+    </div>
+    <table class="table table-striped table-hover table-bordered">
          <thead>
              <tr>
                  <th scope="col">Actions</th>
-                 <th scope="col">ID</th>
+                 <th scope="col" class="cursor-pointer" onclick="changeSort(this, 'id')">
+                     <span>ID</span>
+                     {{ if sortField == "id" }}
+                         <i class="fa fa-sort-{{sortOrder}}"></i>
+                     {{ end }}
+                 </th>
                  {{ range _, frame := ID3Frames }}
-                    {{ if heading == "tag" }}
-                        <th scope="col" data-bs-toggle="tooltip" data-bs-placement="top" title="{{frame.Description}}">{{frame.Tag}}</th>
-                    {{ else }}
-                        <th scope="col" data-bs-toggle="tooltip" data-bs-placement="top" title="{{frame.Tag}}">{{frame.Description}}</th>
-                    {{ end }}
+                    <th scope="col" class="cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" title='{{ heading == "tag" ? frame.Description : frame.Tag }}' onclick="changeSort(this, '{{ frame.Tag }}')">
+                        <span>{{ heading == "tag" ? frame.Tag : frame.Description }}</span>
+                        {{ if sortField == frame.Tag }}
+                            <i class="fa fa-sort-{{sortOrder}}"></i>
+                        {{ end }}
+                    </th>
                  {{ end }}
              </tr>
          </thead>
@@ -32,8 +70,8 @@
                  {{end}}
                      <td>
                          <div class="d-flex flex-row justify-content-around">
-                             <i class="fa fa-trash" style="cursor: pointer;" onclick='startDeleteTrackModal({{ track["id"] }})' title="Delete"></i>
-                             <i class="fa fa-pencil" style="cursor: pointer;" onclick='window.location="/dashboard/tracks/edit/{{ track["id"] }}"' title="Edit"></i>
+                             <i class="cursor-pointer fa fa-trash" onclick='startDeleteTrackModal({{ track["id"] }})' title="Delete"></i>
+                             <i class="cursor-pointer fa fa-pencil" onclick='window.location="/dashboard/tracks/edit/{{ track["id"] }}"' title="Edit"></i>
                          </div>
                      </td>
                      <td>{{track["id"]}}</td>
@@ -48,8 +86,8 @@
              {{ end }}
          </tbody>
 
-     </table>
-     {{ if tracksCount <= 0 }}
+    </table>
+    {{ if tracksCount <= 0 }}
          <div class="row mt-4">
              <div class="col-12">
                  You have no tracks yet. Click the "Add Track" button to add a new track.
@@ -69,6 +107,19 @@
             document.querySelector('#deleteTrackModalTrackName').innerText = trackName
             const modal = new bootstrap.Modal(document.querySelector('#deleteTrackModal'))
             modal.show()
+        }
+
+        const changePage = (page) => {
+            const urlParams = new URLSearchParams(window.location.search)
+            urlParams.set('page', page)
+            window.location.search = urlParams.toString()
+        }
+
+        const changeSort = (el, tag) => {
+            const urlParams = new URLSearchParams(window.location.search)
+            urlParams.set('sortBy', tag)
+            urlParams.set('order', "{{ sortField }}" === tag ? ("{{ sortOrder|upper }}" === 'ASC' ? 'DESC' : 'ASC') : 'ASC')
+            window.location.search = urlParams.toString()
         }
     </script>
 {{end}}

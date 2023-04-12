@@ -38,3 +38,7 @@
 .vl {
     border-left: 3px solid var(--bs-primary);
 }
+
+.cursor-pointer {
+    cursor: pointer;
+}

@@ -55,6 +55,31 @@
             try { body = await response.json() } catch (e) { body.message = ""; console.error(e) }
             return { response, body }
         }
+
+        const insertParam = (key, value, providedParams) => {
+            key = encodeURIComponent(key)
+            value = encodeURIComponent(value)
+
+            const params = providedParams || document.location.search
+            const keyValuePair = params.substring(1).split('&')
+            let found = false
+
+            keyValuePair.forEach((pair, index) => {
+                if (pair.startsWith(key + '=')) {
+                    let pairSplit = pair.split('=')
+                    pairSplit[1] = value;
+                    keyValuePair[index] = pairSplit.join('=')
+                    found = true
+                }
+            })
+
+            if(!found){
+                keyValuePair.push([key,value].join('='))
+            }
+
+            // reload page with new params
+            return "?" + keyValuePair.join('&');
+        }
     </script>
 </body>
 </html>

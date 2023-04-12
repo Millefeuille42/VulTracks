@@ -4,26 +4,25 @@
 	{{ range _, node := array }}
 		<div class="my-2 {{ if isChild && len(node.Children) > 0 }} my-4 {{end}} d-flex flex-column">
 			<div
-						class="d-flex flex-row"
-						data-bs-toggle="collapse"
-						data-bs-target="#collapse-{{node.Folder.Id}}"
-						aria-expanded="false"
-						aria-controls="collapse-{{node.Folder.Id}}"
-						style="cursor: pointer;"
-						onclick="rotate(this)"
-				>
-					<span class="mb-2 col-3" id="folder-{{ node.Folder.Id }}-name">{{node.Folder.Name}}</span>
-					{{ if node.Folder.Count > 0 }}
-						<span class="col-1">{{ node.Folder.Count }} tracks</span>
-					{{end}}
-					{{ if len(node.Children) > 0 }}
-						<i class="col-1 fa fa-chevron-right ms-2 folder_button d-flex justify-content-center align-items-center mb-2"></i>
-					{{end}}
-					<div class="col-1">
-						<i style="cursor: pointer;" onclick='startDeleteFolderModal("{{ node.Folder.Id }}")' class="fa fa-trash me-2"></i>
-						<i style="cursor: pointer;" onclick='refreshFolder("{{ node.Folder.Id }}")' class="fa fa-rotate"></i>
-					</div>
+				class="d-flex flex-row cursor-pointer"
+				data-bs-toggle="collapse"
+				data-bs-target="#collapse-{{node.Folder.Id}}"
+				aria-expanded="false"
+				aria-controls="collapse-{{node.Folder.Id}}"
+				onclick="rotate(this)"
+			>
+				<span class="mb-2 col-3" id="folder-{{ node.Folder.Id }}-name">{{node.Folder.Name}}</span>
+				{{ if node.Folder.Count > 0 }}
+					<span class="col-1">{{ node.Folder.Count }} tracks</span>
+				{{end}}
+				{{ if len(node.Children) > 0 }}
+					<i class="col-1 fa fa-chevron-right ms-2 folder_button d-flex justify-content-center align-items-center mb-2"></i>
+				{{end}}
+				<div class="col-1">
+					<i onclick='startDeleteFolderModal("{{ node.Folder.Id }}")' class="cursor-pointer fa fa-trash me-2"></i>
+					<i onclick='refreshFolder("{{ node.Folder.Id }}")' class="cursor-pointer fa fa-rotate"></i>
 				</div>
+			</div>
 			<div class="{{ if len(node.Children) > 0 }} vl ps-4 {{end}} collapse" id="collapse-{{node.Folder.Id}}">
 				{{ yield folder(array=node.Children, isChild=true) }}
 			</div>

@@ -1,0 +1,62 @@
+[
+	{
+		"name": "server",
+		"type": "section",
+		"fields": [
+			{
+				"name": "port",
+				"type": "numeric",
+				"description": "The port to listen on",
+				"causes_restart": true,
+				"default_value": "4000"
+			},
+			{
+				"name": "host",
+				"type": "string",
+				"description": "The host to listen on",
+				"causes_restart": true,
+				"default_value": "0.0.0.0"
+			}
+		]
+	},
+	{
+		"name": "dashboard",
+		"type": "section",
+		"fields": [
+			{
+				"name": "tracks",
+				"type": "section",
+				"fields": [
+					{
+						"name": "heading",
+						"type": "string",
+						"description": "The heading to use for the tracks dashboard",
+						"causes_restart": false,
+						"default_value": "tag"
+					},
+					{
+						"name": "default_sort",
+						"type": "string",
+						"description": "The default sort column",
+						"causes_restart": false,
+						"default_value": "id"
+					},
+					{
+						"name": "default_order",
+						"type": "string",
+						"description": "The default sort order",
+						"causes_restart": false,
+						"default_value": "asc"
+					},
+					{
+						"name": "default_per_page",
+						"type": "numeric",
+						"description": "The default number of rows per page",
+						"causes_restart": false,
+						"default_value": "-1"
+					}
+				]
+			}
+		]
+	}
+]
