@@ -7,8 +7,9 @@ import (
 )
 
 type SettingsStruct struct {
-	Port int    `json:"port"`
-	Host string `json:"host"`
+	Port    string `json:"port" validate:"required,numeric"`
+	Host    string `json:"host" validate:"required,ip"`
+	Heading string `json:"heading" validate:"required"`
 }
 
 var Settings = SettingsStruct{}
@@ -19,6 +20,18 @@ func RefreshSettings() error {
 		return err
 	}
 	err = json.Unmarshal(data, &Settings)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func RewriteSettings() error {
+	data, err := json.MarshalIndent(Settings, "", "\t")
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(globals.ConfigLocation+"/config.json", data, 0644)
 	if err != nil {
 		return err
 	}

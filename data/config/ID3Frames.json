@@ -1,9 +1,30 @@
 [
-  {"Tag": "TIT2", "Description": "Title of the track"},
-  {"Tag": "TPE1", "Description": "Main artist"},
-  {"Tag": "TALB", "Description": "Album it belongs to"},
-  {"Tag": "TRCK", "Description": "Track number on the album"},
-  {"Tag": "TCON", "Description": "Genre of the track"},
-  {"Tag": "TBPM", "Description": "BPM of the track"},
-  {"Tag": "TENC", "Description": "Encoded by (who)"}
+	{
+		"tag": "TIT2",
+		"description": "Title of the track"
+	},
+	{
+		"tag": "TPE1",
+		"description": "Main artist"
+	},
+	{
+		"tag": "TALB",
+		"description": "Album it belongs to"
+	},
+	{
+		"tag": "TRCK",
+		"description": "Track number on the album"
+	},
+	{
+		"tag": "TCON",
+		"description": "Genre of the track"
+	},
+	{
+		"tag": "TBPM",
+		"description": "BPM of the track"
+	},
+	{
+		"tag": "TENC",
+		"description": "Encoded by (who)"
+	}
 ]

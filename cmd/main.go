@@ -1,14 +1,15 @@
 package main
 
 import (
+	"VulTracks/pkg/app"
 	"VulTracks/pkg/database"
 	"VulTracks/pkg/globals"
 	"VulTracks/pkg/middlewares/sessionChecker"
 	"VulTracks/pkg/models"
 	"VulTracks/pkg/routes/auth"
-	"VulTracks/pkg/routes/example"
 	"VulTracks/pkg/routes/folder"
 	"VulTracks/pkg/routes/index"
+	"VulTracks/pkg/routes/settingsRoute"
 	"VulTracks/pkg/routes/track"
 	"VulTracks/pkg/routes/user"
 	"VulTracks/pkg/store"
@@ -17,13 +18,11 @@ import (
 	"VulTracks/pkg/utils/settings"
 	"VulTracks/pkg/validator"
 	"fmt"
-	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
-	"github.com/gofiber/template/jet"
 	"log"
 )
 
@@ -72,6 +71,33 @@ func install() {
 	populateDatabase()
 }
 
+func registerMiddlewares(app *fiber.App) {
+	app.Use(logger.New())
+	if !globals.Dev {
+		app.Use(csrf.New())
+	}
+	app.Use(favicon.New(favicon.Config{
+		File: globals.StaticLocation + "/images/logo.png",
+		URL:  "/favicon.ico",
+	}))
+
+	app.Get("/metrics", monitor.New(monitor.Config{Title: "VulTracks Metrics Page"}))
+	app.Static("/static", globals.StaticLocation)
+
+	app.Use(sessionChecker.New(sessionChecker.Config{
+		Filter: sessionChecker.DefaultFilter,
+	}))
+}
+
+func registerRoutes(app *fiber.App) {
+	index.Register(app)
+	auth.Register(app)
+	user.Register(app)
+	track.Register(app)
+	folder.Register(app)
+	settingsRoute.Register(app)
+}
+
 func main() {
 	if globals.RootLocation == "" {
 		fmt.Println("Unable to find a proper installation location, please set your XDG_CONFIG_HOME environment variable")
@@ -110,41 +136,17 @@ func main() {
 		}
 	}
 
-	engine := jet.New(globals.TemplateLocation, ".jet.html")
 	store.Store = store.NewStore()
 	validator.Validator = validator.NewValidator()
+	app.App = app.NewApp()
+	registerMiddlewares(app.App)
+	registerRoutes(app.App)
+	utils.SetupCloseHandler(app.App)
 
-	app := fiber.New(fiber.Config{
-		AppName:     "VulTracks",
-		Views:       engine,
-		JSONEncoder: json.Marshal,
-		JSONDecoder: json.Unmarshal,
-	})
-
-	app.Use(logger.New())
-	if !globals.Dev {
-		app.Use(csrf.New())
+	for !globals.Shutdown {
+		err = app.StartApp(app.App)
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
-	app.Use(favicon.New(favicon.Config{
-		File: globals.StaticLocation + "/images/logo.png",
-		URL:  "/favicon.ico",
-	}))
-
-	app.Get("/metrics", monitor.New(monitor.Config{Title: "VulTracks Metrics Page"}))
-	app.Static("/static", globals.StaticLocation)
-
-	app.Use(sessionChecker.New(sessionChecker.Config{
-		Filter: sessionChecker.DefaultFilter,
-	}))
-
-	example.Register(app)
-	index.Register(app)
-	auth.Register(app)
-	user.Register(app)
-	track.Register(app)
-	folder.Register(app)
-
-	utils.SetupCloseHandler(app)
-
-	log.Println(app.Listen(fmt.Sprintf("%s:%d", settings.Settings.Host, settings.Settings.Port)))
 }

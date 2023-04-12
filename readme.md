@@ -19,7 +19,6 @@ All-In-One music library manager
 
 - [x] Edit Track
     - [ ] Move track on path edit ?
-- [ ] Settings
 - [ ] Sort Table by column
 - [ ] Filter Table
     - [ ] Filter Table by column ?

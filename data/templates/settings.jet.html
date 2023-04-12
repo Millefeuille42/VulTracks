@@ -1,0 +1,194 @@
+{{extends "layout/dashboard"}}
+
+{{ block dashboardBody() }}
+	<div class="row justify-content-center">
+		<div class="col-12">
+			<h1>Settings</h1>
+			<p>
+				Here you can change the settings of VulTracks<br/>
+				Settings with a * symbol require a restart to apply.
+			</p>
+		</div>
+	</div>
+	<form class="row needs-validation" id="settingsForm" onsubmit="validateSettingsForm(); return false">
+		{{ range key, val := settings }}
+			{{ if key != "Heading" }}
+				<div class="col-12 my-2">
+					<label for="settingsForm{{key}}" class="form-label">{{key}} *</label>
+					<input type="text" class="form-control" id="settingsForm{{key}}" value="{{val}}" required>
+				</div>
+			{{ end }}
+		{{ end }}
+		<div class="col-12 my-2">
+			<label for="settingsFormHeading" class="form-label">Heading</label>
+			<select class="form-select" aria-label="Select your heading" id="settingsFormHeading">
+				<option value="" selected>{{ settings["Heading"] }}</option>
+				{{ if settings["Heading"] == "description" }}
+					<option value="tag">tag</option>
+				{{ else }}
+					<option value="description">description</option>
+				{{ end }}
+			</select>
+		</div>
+		<div class="col-12 my-2 d-flex align-items-center">
+			<button class="btn btn-primary" type="submit" form="settingsForm">Submit</button>
+			<button class="btn btn-primary ms-4" onclick="window.location = '/restart'" >Restart</button>
+			<div class="ms-4 spinner-border text-primary visually-hidden" id="settingsSpinner" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+	</form>
+
+
+	<div class="row mt-5 justify-content-center">
+		<div class="col-12">
+			<h1>ID3</h1>
+			<p>
+				Here you can change which ID3 Tags are parsed and shown.<br/>
+				There is no need to restart for the changes to apply.<br/>
+				For a full list of supported tags, refer to <a href="https://exiftool.org/TagNames/ID3.html#v2_3">the id3v2_3 list on this page</a>.
+			</p>
+		</div>
+	</div>
+	<form class="needs-validation" id="id3Form" onsubmit="validateID3Form(); return false">
+		<div class="row">
+			<div class="col-5"><h4 class="mt-4 mb-2">Tag</h4></div>
+			<div class="col-5"><h4 class="mt-4 mb-2">Description</h4></div>
+		</div>
+		{{ range _, frame := id3Frames }}
+			<div class="row id3-frame">
+				<div class="col-5 my-2 d-flex align-items-center">
+					<label class="form-label w-100">
+						<input type="text" class="form-control id3-frame-tag" value="{{frame.Tag}}" required>
+					</label>
+				</div>
+				<div class="col-5 my-2 d-flex align-items-center">
+					<label class="form-label w-100">
+						<input type="text" class="form-control id3-frame-description" value="{{frame.Description}}" required>
+					</label>
+				</div>
+				<div class="col-1 my-2 d-flex align-items-start">
+					<button class="btn btn-danger" type="button" onclick="deleteFrame(this)"><i class="fa fa-cancel"></i></button>
+				</div>
+			</div>
+		{{ end }}
+		<div class="id3-frame-insert visually-hidden"></div>
+		<div class="row id3-frame-template visually-hidden">
+			<div class="col-5 my-2 d-flex align-items-center">
+				<label class="form-label w-100">
+					<input type="text" class="form-control id3-frame-tag" value="">
+				</label>
+			</div>
+			<div class="col-5 my-2 d-flex align-items-center">
+				<label class="form-label w-100">
+					<input type="text" class="form-control id3-frame-description" value="">
+				</label>
+			</div>
+			<div class="col-1 my-2 d-flex align-items-start">
+				<button class="btn btn-danger" type="button" onclick="deleteFrame(this)"><i class="fa fa-cancel"></i></button>
+			</div>
+		</div>
+		<div class="col-12 mt-2 mb-4 d-flex align-items-center">
+			<button class="btn btn-success" type="button" onclick="addFrame()"><i class="fa fa-plus"></i></button>
+		</div>
+		<div class="col-12 mt-4 d-flex align-items-center">
+			<button class="btn btn-primary" type="submit" form="id3Form">Submit</button>
+			<div class="ms-4 spinner-border text-primary visually-hidden" id="id3Spinner" role="status">
+				<span class="visually-hidden">Loading...</span>
+			</div>
+		</div>
+	</form>
+{{end}}
+
+{{block dashboardScripts()}}
+	<script>
+		const frameInsert = document.querySelector('.id3-frame-insert')
+        const frameTemplate = document.querySelector('.id3-frame-template')
+		const id3Form = document.querySelector('#id3Form')
+		const id3Spinner = document.querySelector('#id3Spinner')
+
+		const deleteFrame = (deleteButton) => {
+            for (let parent = deleteButton; parent !== id3Form; parent = parent.parentElement) {
+				if (parent.classList.contains('id3-frame')) {
+					parent.remove()
+					return
+				}
+			}
+		}
+
+        const addFrame = () => {
+            const frame = frameTemplate.cloneNode(true)
+            frame.classList.remove('visually-hidden')
+            frame.classList.remove('id3-frame-template')
+            frame.classList.add('id3-frame')
+			frame.querySelector('.id3-frame-tag').required = true
+			frame.querySelector('.id3-frame-description').required = true
+
+			id3Form.insertBefore(frame, frameInsert)
+		}
+
+        const validateID3Form = () => {
+            if (!id3Form.checkValidity()) {
+                id3Form.classList.add('was-validated')
+                return false
+            }
+            id3Spinner.classList.remove('visually-hidden')
+
+			const id3FramesNodes = document.getElementsByClassName('id3-frame')
+			const id3Frames = []
+
+			for (const id3FrameNode of id3FramesNodes) {
+                id3Frames.push({
+					tag: id3FrameNode.getElementsByClassName('id3-frame-tag')[0].value,
+					description: id3FrameNode.getElementsByClassName('id3-frame-description')[0].value
+				})
+			}
+
+            performRequest('/settings/id3', 'PUT', id3Frames).then(response => {
+                id3Spinner.classList.add('visually-hidden')
+                if (response.response.status === 200) {
+                    generateToast('ID3 Tags updated successfully.', 'success')
+                    return
+                }
+                generateToast('An error occurred. Please try again later.', 'danger')
+            }).catch(error => {
+                console.error(error)
+                id3Spinner.classList.add('visually-hidden')
+                generateToast('An error occurred. Please try again later.', 'danger')
+            })
+            return false
+        }
+
+	    const settingsForm = document.querySelector('#settingsForm')
+	    const settingsSpinner = document.querySelector('#settingsSpinner')
+
+	    const validateSettingsForm = () => {
+	        if (!settingsForm.checkValidity()) {
+	            settingsForm.classList.add('was-validated')
+	            return false
+	        }
+            settingsSpinner.classList.remove('visually-hidden')
+
+			const settings = {}
+            for (const element of settingsForm.elements) {
+                if (element.id.startsWith('settingsForm')) {
+                    settings[element.id.replace('settingsForm', '').toLowerCase()] = element.value
+                }
+            }
+
+	        performRequest('/settings', 'PUT', settings).then(response => {
+                settingsSpinner.classList.add('visually-hidden')
+	            if (response.response.status === 200) {
+	                generateToast('Settings updated successfully.', 'success')
+	                return
+	            }
+	            generateToast('An error occurred. Please try again later.', 'danger')
+	        }).catch(error => {
+	            console.error(error)
+                settingsSpinner.classList.add('visually-hidden')
+	            generateToast('An error occurred. Please try again later.', 'danger')
+	        })
+	        return false
+	    }
+	</script>
+{{end}}

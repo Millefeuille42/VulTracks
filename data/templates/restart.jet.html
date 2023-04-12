@@ -1,0 +1,29 @@
+{{extends "layout/base"}}
+
+{{block title()}} VulTracks - Restarting {{end}}
+
+{{block body()}}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-12">
+      <h1>VulTracks is restarting !</h1>
+      <p>It will automatically bring you back to the login page after reboot.</p>
+    </div>
+  </div>
+</div>
+{{end}}
+
+{{block scripts()}}
+  <script>
+    const sendRestartRequest = () => {
+      performRequest('/settings/restart', 'POST', {})
+      setTimeout(() => {
+        window.location = "{{ accessURL }}"
+      }, 5000)
+    }
+
+    window.onload = () => {
+      sendRestartRequest()
+    }
+  </script>
+{{end}}

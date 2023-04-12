@@ -29,3 +29,15 @@ func RefreshID3Frames() error {
 	}
 	return nil
 }
+
+func RewriteID3Frames() error {
+	data, err := json.MarshalIndent(ID3Frames, "", "\t")
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(globals.ConfigLocation+"/ID3Frames.json", data, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -11,4 +11,5 @@ var (
 	DatabaseLocation = RootLocation + "/database.sqlite3"
 
 	FirstRun = false
+	Shutdown = false
 )

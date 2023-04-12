@@ -15,7 +15,11 @@
                  <th scope="col">Actions</th>
                  <th scope="col">ID</th>
                  {{ range _, frame := ID3Frames }}
-                     <th scope="col" data-bs-toggle="tooltip" data-bs-placement="top" title="{{frame.Description}}">{{frame.Tag}}</th>
+                    {{ if heading == "tag" }}
+                        <th scope="col" data-bs-toggle="tooltip" data-bs-placement="top" title="{{frame.Description}}">{{frame.Tag}}</th>
+                    {{ else }}
+                        <th scope="col" data-bs-toggle="tooltip" data-bs-placement="top" title="{{frame.Tag}}">{{frame.Description}}</th>
+                    {{ end }}
                  {{ end }}
              </tr>
          </thead>

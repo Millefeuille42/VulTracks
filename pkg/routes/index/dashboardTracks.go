@@ -4,6 +4,7 @@ import (
 	"VulTracks/pkg/models"
 	"VulTracks/pkg/utils"
 	"VulTracks/pkg/utils/id3Utils"
+	"VulTracks/pkg/utils/settings"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -29,5 +30,6 @@ func dashboardTracksHandler(c *fiber.Ctx) error {
 		"tracksCount": len(tracks),
 		"ID3Frames":   id3Utils.ID3Frames,
 		"sections":    getSections("tracks"),
+		"heading":     settings.Settings.Heading,
 	})
 }

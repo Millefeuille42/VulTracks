@@ -20,7 +20,7 @@ func getSections(active string) []sectionsStruct {
 		},
 		{
 			Text:   "Settings",
-			Link:   "dashboard/settings",
+			Link:   "/dashboard/settings",
 			Active: active == "settings",
 		},
 	}
