@@ -19,6 +19,11 @@ func getSections(active string) []sectionsStruct {
 			Active: active == "folders",
 		},
 		{
+			Text:   "ID3 Tags",
+			Link:   "/dashboard/id3Tags",
+			Active: active == "id3Tags",
+		},
+		{
 			Text:   "Settings",
 			Link:   "/dashboard/settings",
 			Active: active == "settings",

@@ -15,5 +15,6 @@ func Register(app *fiber.App) {
 	dashboard.Get("/tracks", dashboardTracksHandler)
 	dashboard.Get("/tracks/edit/:id", dashboardTracksEdit)
 	dashboard.Get("/folders", dashboardFoldersHandler)
+	dashboard.Get("/id3Tags", dashboardID3TagsHandler)
 	dashboard.Get("/settings", dashboardSettingsHandler)
 }
