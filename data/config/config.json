@@ -1,8 +1,8 @@
 {
-	"dashboard.tracks.default_order": "asc",
-	"dashboard.tracks.default_per_page": "10",
-	"dashboard.tracks.default_sort": "id",
-	"dashboard.tracks.heading": "tag",
-	"server.host": "0.0.0.0",
-	"server.port": "4000"
+	"dashboard-tracks-default_order": "asc",
+	"dashboard-tracks-default_per_page": "20",
+	"dashboard-tracks-default_sort": "TIT2",
+	"dashboard-tracks-heading": "description",
+	"server-host": "0.0.0.0",
+	"server-port": "4000"
 }

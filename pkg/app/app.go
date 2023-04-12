@@ -23,7 +23,7 @@ func NewApp() *fiber.App {
 }
 
 func StartApp(app *fiber.App) error {
-	return app.Listen(fmt.Sprintf("%s:%s", settings.Settings["server.host"], settings.Settings["server.port"]))
+	return app.Listen(fmt.Sprintf("%s:%s", settings.Settings["server-host"], settings.Settings["server-port"]))
 }
 
 func StopApp(app *fiber.App) error {

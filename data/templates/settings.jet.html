@@ -1,35 +1,29 @@
 {{extends "layout/dashboard"}}
 
 {{ block dashboardBody() }}
-	<div class="row justify-content-center">
-		<div class="col-12">
-			<h1>Settings</h1>
-			<p>
-				Here you can change the settings of VulTracks<br/>
-				Settings with a * symbol require a restart to apply.
-			</p>
-		</div>
-	</div>
 	<form class="row needs-validation" id="settingsForm" onsubmit="validateSettingsForm(); return false">
-		{{ range key, val := settings }}
-			{{ if key != "Heading" }}
-				<div class="col-12 my-2">
-					<label for="settingsForm{{key}}" class="form-label">{{key}} *</label>
-					<input type="text" class="form-control" id="settingsForm{{key}}" value="{{val}}" required>
-				</div>
-			{{ end }}
-		{{ end }}
-		<div class="col-12 my-2">
-			<label for="settingsFormHeading" class="form-label">Heading</label>
-			<select class="form-select" aria-label="Select your heading" id="settingsFormHeading">
-				<option value="" selected>{{ settings["Heading"] }}</option>
-				{{ if settings["Heading"] == "description" }}
-					<option value="tag">tag</option>
-				{{ else }}
-					<option value="description">description</option>
+		{{ range _, parameter := settings }}
+			<div class="col-12 my-2">
+				{{ if parameter.Type == "section" && len(parameter.Fields) > 0 }}
+					<h2 class="text-capitalize">{{parameter.Name}}</h2>
+					<hr/>
+				{{else}}
+					<label for="settingsForm{{parameter.FullName}}" class="form-label text-capitalize">
+						<span>{{parameter.Name}}</span>
+						{{ if parameter.CausesRestart }}<i class="text-danger fa fa-warning"></i>{{ end }}
+					</label>
+					{{ if parameter.Type != "select" }}
+						<input type="{{ parameter.Type }}" class="form-control" id="settingsForm{{parameter.FullName}}" value="{{parameter.DefaultValue}}" required>
+					{{ else }}
+						<select class="form-select" id="settingsForm{{parameter.FullName}}" aria-label="{{ parameter.Name }}" required>
+							{{ range _, option := parameter.Choices }}
+								<option {{ if option == parameter.DefaultValue }} selected {{end}} class="text-capitalize" value="{{option}}">{{option}}</option>
+							{{ end }}
+						</select>
+					{{ end }}
 				{{ end }}
-			</select>
-		</div>
+			</div>
+		{{ end }}
 		<div class="col-12 my-2 d-flex align-items-center">
 			<button class="btn btn-primary" type="submit" form="settingsForm">Submit</button>
 			<button class="btn btn-primary ms-4" onclick="window.location = '/restart'" >Restart</button>
@@ -172,7 +166,7 @@
 			const settings = {}
             for (const element of settingsForm.elements) {
                 if (element.id.startsWith('settingsForm')) {
-                    settings[element.id.replace('settingsForm', '').toLowerCase()] = element.value
+                    settings[element.id.replaceAll('settingsForm', '').toLowerCase()] = element.value
                 }
             }
 

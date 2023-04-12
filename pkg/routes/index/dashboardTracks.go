@@ -18,15 +18,15 @@ func parseDashboardTracksQuery(c *fiber.Ctx) (int, int, string, string) {
 	sortBy := c.Query("sortBy")
 
 	if order == "" {
-		order = settings.Settings["dashboard.tracks.default_order"]
+		order = settings.Settings["dashboard-tracks-default_order"]
 	}
 
 	if sortBy == "" {
-		sortBy = settings.Settings["dashboard.tracks.default_sort"]
+		sortBy = settings.Settings["dashboard-tracks-default_sort"]
 	}
 
 	if c.Query("limit") == "" {
-		l64, err := strconv.ParseInt(settings.Settings["dashboard.tracks.default_per_page"], 10, 64)
+		l64, err := strconv.ParseInt(settings.Settings["dashboard-tracks-default_per_page"], 10, 64)
 		if err != nil {
 			log.Println(err)
 			limit = -1
@@ -101,7 +101,7 @@ func dashboardTracksHandler(c *fiber.Ctx) error {
 		"tracksCount": len(tracks),
 		"ID3Frames":   id3Utils.ID3Frames,
 		"sections":    getSections("tracks"),
-		"heading":     settings.Settings["dashboard.tracks.heading"],
+		"heading":     settings.Settings["dashboard-tracks-heading"],
 		"sortOrder":   strings.ToLower(order),
 		"sortField":   sortBy,
 		"numberPages": numberPages,

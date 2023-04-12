@@ -9,7 +9,7 @@ import (
 func dashboardSettingsHandler(c *fiber.Ctx) error {
 	return c.Render("settings", fiber.Map{
 		"username":  c.Locals("name").(string),
-		"settings":  settings.Settings,
+		"settings":  settings.ToParameters("", nil),
 		"id3Frames": id3Utils.ID3Frames,
 		"sections":  getSections("settings"),
 	})

@@ -5,14 +5,14 @@
 		"fields": [
 			{
 				"name": "port",
-				"type": "numeric",
+				"type": "number",
 				"description": "The port to listen on",
 				"causes_restart": true,
 				"default_value": "4000"
 			},
 			{
 				"name": "host",
-				"type": "string",
+				"type": "text",
 				"description": "The host to listen on",
 				"causes_restart": true,
 				"default_value": "0.0.0.0"
@@ -29,29 +29,37 @@
 				"fields": [
 					{
 						"name": "heading",
-						"type": "string",
+						"type": "select",
+						"choices": [
+							"tag",
+							"description"
+						],
 						"description": "The heading to use for the tracks dashboard",
 						"causes_restart": false,
 						"default_value": "tag"
 					},
 					{
 						"name": "default_sort",
-						"type": "string",
+						"type": "text",
 						"description": "The default sort column",
 						"causes_restart": false,
 						"default_value": "id"
 					},
 					{
 						"name": "default_order",
-						"type": "string",
+						"type": "select",
+						"choices": [
+							"asc",
+							"desc"
+						],
 						"description": "The default sort order",
 						"causes_restart": false,
 						"default_value": "asc"
 					},
 					{
 						"name": "default_per_page",
-						"type": "numeric",
-						"description": "The default number of rows per page",
+						"type": "number",
+						"description": "The default number of rows per page, -1 for all",
 						"causes_restart": false,
 						"default_value": "-1"
 					}

@@ -9,7 +9,7 @@ import (
 func updateSettingsHandler(c *fiber.Ctx) error {
 	newSettings := make(map[string]string)
 
-	if err := c.BodyParser(newSettings); err != nil {
+	if err := c.BodyParser(&newSettings); err != nil {
 		return utils.ReturnError(c, fiber.StatusBadRequest, err)
 	}
 
